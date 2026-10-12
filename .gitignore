@@ -1,0 +1,35 @@
+# Compiled Class files & Build outputs
+*.class
+bin/
+build/
+sources.txt
+
+# Runtime generated files & diagnostic logs
+runtime/logs/*
+!runtime/logs/.gitkeep
+runtime/reports/*
+!runtime/reports/.gitkeep
+runtime/benchmarks/*
+!runtime/benchmarks/.gitkeep
+runtime/data/*
+!runtime/data/.gitkeep
+*.log
+.portability_probe
+
+# IDE metadata & project caches
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.metadata/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python bytecode (from dossier generator)
+__pycache__/
+*.pyc

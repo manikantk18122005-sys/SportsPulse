@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SportsPulse-Java" default="compile" basedir=".">
+    <description>
+        SportsPulse — Sports Analytics &amp; Performance Platform
+        Standard, portable, dependency-free Apache Ant build file.
+    </description>
+
+    <!-- Project Directory Properties (100% relative, no hardcoded machine paths) -->
+    <property name="src.dir" value="src"/>
+    <property name="resources.dir" value="resources"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="runtime.dir" value="runtime"/>
+    <property name="jar.name" value="SportsPulse.jar"/>
+    <property name="jar.file" value="${dist.dir}/${jar.name}"/>
+    <property name="main.class" value="com.sportspulse.Main"/>
+    <property name="test.class" value="com.sportspulse.SelfTest"/>
+    <property name="env.class" value="com.sportspulse.EnvironmentCheck"/>
+
+    <!-- Java Compilation Target Level -->
+    <property name="java.source.level" value="17"/>
+    <property name="java.target.level" value="17"/>
+
+    <!-- Target: clean -->
+    <target name="clean" description="Removes all compiled classes, build artifacts, and JAR distributions">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="bin"/>
+        <delete file="sources.txt" quiet="true"/>
+        <echo message="[Clean] Removed build/, dist/, bin/, and temporary files."/>
+    </target>
+
+    <!-- Target: init -->
+    <target name="init">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${runtime.dir}/logs"/>
+        <mkdir dir="${runtime.dir}/reports"/>
+        <mkdir dir="${runtime.dir}/benchmarks"/>
+        <mkdir dir="${runtime.dir}/data"/>
+    </target>
+
+    <!-- Target: compile -->
+    <target name="compile" depends="init" description="Compiles all Java source files into build/classes">
+        <echo message="[Compile] Compiling Java sources from ${src.dir}..."/>
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               includeantruntime="false"
+               encoding="UTF-8"
+               source="${java.source.level}"
+               target="${java.target.level}"
+               debug="true">
+            <!-- Also support legacy sportspulse/src if present -->
+            <src path="${src.dir}"/>
+        </javac>
+        <!-- Copy bundled resources if any -->
+        <if-available file="${resources.dir}">
+            <copy todir="${classes.dir}">
+                <fileset dir="${resources.dir}" erroronmissingdir="false"/>
+            </copy>
+        </if-available>
+        <echo message="[Compile] Build OK -> ${classes.dir}"/>
+    </target>
+
+    <!-- Target: jar -->
+    <target name="jar" depends="compile" description="Packages the compiled application into dist/SportsPulse.jar">
+        <echo message="[Jar] Packaging runnable JAR -> ${jar.file}..."/>
+        <jar destfile="${jar.file}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Built-By" value="SportsPulse Team"/>
+                <attribute name="Implementation-Title" value="SportsPulse Analytics Platform"/>
+                <attribute name="Implementation-Version" value="2.0-PORTABLE"/>
+            </manifest>
+        </jar>
+        <!-- Also place a copy in project root for convenience -->
+        <copy file="${jar.file}" tofile="${jar.name}" overwrite="true"/>
+        <echo message="[Jar] Created standalone runnable JAR: ${jar.file}"/>
+    </target>
+
+    <!-- Target: run -->
+    <target name="run" depends="compile" description="Executes the SportsPulse interactive platform">
+        <java classname="${main.class}" fork="true">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+            </classpath>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+        </java>
+    </target>
+
+    <!-- Target: test -->
+    <target name="test" depends="compile" description="Runs the comprehensive 165+ assertion self-test suite">
+        <java classname="${test.class}" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+            </classpath>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+        </java>
+    </target>
+
+    <!-- Target: env-check -->
+    <target name="env-check" depends="compile" description="Runs the automated host environment portability check">
+        <java classname="${env.class}" fork="true">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+            </classpath>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+        </java>
+    </target>
+
+</project>
